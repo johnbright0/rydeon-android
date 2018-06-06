@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.rydeon.andr"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -23,11 +23,22 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
-    implementation 'com.google.android.gms:play-services-maps:11.8.0'
+    implementation 'com.google.android.gms:play-services-maps:15.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.android.support:support-compat:25.1.1'
+    implementation 'com.android.support:support-compat:27.1.1'
     implementation 'com.daimajia.easing:library:2.0@aar'
     implementation 'com.daimajia.androidanimations:library:2.3@aar'
+    implementation 'com.github.irvingryan:verifycodeview:1.1.0'
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
+    implementation 'com.google.android.gms:play-services-places:15.0.1'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'com.mindorks:paracamera:0.2.2'
+    implementation 'com.koushikdutta.ion:ion:2.+'
+    implementation 'com.auth0.android:jwtdecode:1.1.1'
+    implementation 'com.github.safetysystemtechnology:android-shake-detector:v1.2'
+    implementation 'com.github.Binary-Finery:Bungee:master-SNAPSHOT'
+    implementation 'com.github.StevenDXC:DxLoadingButton:2.0'
+
 }

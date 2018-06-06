@@ -1,6 +1,12 @@
 package com.rydeon.andr;
 
+import android.content.Intent;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -13,24 +19,65 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.GeoDataClient;
+import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.rydeon.andr.helper.SessionManager;
+import com.rydeon.andr.registration.LoginActivity;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
+
+    private PlaceDetectionClient mPlaceDetectionClient;
+    private GeoDataClient mGeoDataClient;
+    private GoogleMap mMap;
+    private boolean mLocationPermissionGranted;
+    private int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private int DEFAULT_ZOOM = 15;
+    private Location mLastKnownLocation, currentLocation;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    String location_coordinates= "";
+    SessionManager sm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
+//       if(Build.VERSION.SDK_INT > 20){
+//           toolbar.setElevation(0);         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        sm = new SessionManager(this);
+        if(!sm.isLoggedIn()){
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }else{
+            sm.setLogin(false);
+        }
+
+
+
+        // Construct a GeoDataClient.
+        mGeoDataClient = Places.getGeoDataClient(this, null);
+
+        // Construct a PlaceDetectionClient.
+        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
+
+        // Construct a FusedLocationProviderClient.
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MainActivity.this);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -66,10 +113,7 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -88,14 +132,56 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
+    }
+
+    @Override
+    public void onMyLocationClick(@NonNull Location location) {
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+        mMap.setOnMyLocationClickListener(this);
+
+        getLocationCordinates();
+    }
+
+    private String myCordinates = "6.666600400000001,-1.6162709";
+    private double latitude = 5.666667;
+    private double longitude = 0.000000;
+    private void getLocationCordinates(){
+
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+
+        currentLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+
+        if(currentLocation != null){
+            latitude = currentLocation.getLatitude();
+            longitude = currentLocation.getLongitude();
+
+            myCordinates = Double.toString(latitude) + "," + Double.toString(longitude);
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, latitude), DEFAULT_ZOOM));
+
+         //   getPlusCodeData(myCordinates);
+
+
+
+        }
+
     }
 }
