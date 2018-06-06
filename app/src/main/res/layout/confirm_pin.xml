@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        >
+
+        <TextView
+            android:id="@+id/verificationMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="A verification code has been sent to +2333553. Enter code to confirm registration"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="15dp"
+            />
+
+    <com.github.irvingryan.VerifyCodeView
+        android:id="@+id/verifyCodeView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:vcTextColor="@color/white"
+        app:vcTextSize="6"
+        app:vcLineStyle="noLine"
+        app:vcLineWidth="3dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@+id/verificationMessage"
+        />
+
+        <com.dx.dxloadingbutton.lib.LoadingButton
+            android:id="@+id/btn_verify"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:lb_resetAfterFailed="true"
+            app:lb_btnRippleColor="@color/black"
+            app:lb_btnDisabledColor="@color/light_gray"
+            app:lb_disabledTextColor="@color/gray"
+            app:lb_btnText="@string/verify"
+            app:lb_btnColor="@color/colorAccent"
+            android:layout_marginTop="30dp"
+            android:layout_below="@+id/verifyCodeView"
+
+            />
+        <Button
+            android:id="@+id/btn_change_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="Change phone number"
+            android:textColor="@color/white"
+            android:layout_marginTop="50dp"
+            android:layout_below="@+id/btn_verify"/>
+
+        <Button
+            android:id="@+id/btn_resend_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:text="resend code"
+            android:textColor="@color/white"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/btn_change_number"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

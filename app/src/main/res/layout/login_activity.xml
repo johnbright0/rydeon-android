@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:gravity="center"
+        android:src="@drawable/rydeonlogo"
+        android:scaleType="centerInside"
+        android:layout_marginTop="60dp"/>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:gravity="center"
+
+        >
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_edt_login_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/phone"
+            android:textColorHint="@color/white"
+            app:hintAnimationEnabled="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/edt_login_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"
+                android:textColor="@color/white" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/layout_edt_login_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_edt_login_phone"
+            android:layout_marginTop="5dp"
+            android:hint="@string/password"
+            android:textColorHint="@color/white"
+            app:hintAnimationEnabled="true"
+            app:passwordToggleEnabled="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:textColor="@color/white" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <com.dx.dxloadingbutton.lib.LoadingButton
+            android:id="@+id/btn_login"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:lb_resetAfterFailed="true"
+            app:lb_btnRippleColor="@color/black"
+            app:lb_btnDisabledColor="@color/light_gray"
+            app:lb_disabledTextColor="@color/gray"
+            app:lb_btnText="@string/login"
+            android:layout_below="@+id/layout_edt_login_password"
+            app:lb_btnColor="@color/colorAccent"
+            />
+
+        <Button
+            android:id="@+id/btn_forg_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_login"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:text="@string/forget_password"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txtRegisterUser"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:text="Not registered? Click Here"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"/>
+
+
+</RelativeLayout>
