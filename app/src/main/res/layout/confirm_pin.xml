@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:text="Change phone number"
+            android:text="@string/change_phone_number"
             android:textColor="@color/white"
             android:layout_marginTop="50dp"
             android:layout_below="@+id/btn_verify"/>
@@ -67,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            android:text="resend code"
+            android:text="@string/resend_code"
             android:textColor="@color/white"
             android:layout_marginTop="20dp"
             android:layout_below="@id/btn_change_number"/>

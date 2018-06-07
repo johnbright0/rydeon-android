@@ -136,6 +136,10 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
 
         }
+        else if (id == R.id.logout){
+            sm.setLogin(false);
+            sm.setPhoneNumber("");
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

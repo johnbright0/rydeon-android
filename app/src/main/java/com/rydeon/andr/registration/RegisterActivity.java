@@ -131,6 +131,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!verifyInputs()) {
                     //   Toast.makeText(LoginRegisterActivity.this, "POST DATA", Toast.LENGTH_SHORT).show();
                     registerUser(first_name, last_name, gender,  phone, password, confirm_password);
+                //    startActivity(new Intent(RegisterActivity.this, VerifyCodeActivity.class));
 
                 }
 

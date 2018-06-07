@@ -60,6 +60,12 @@
         <activity android:name=".registration.VerifyCodeActivity"
             android:theme="@style/Theme.Design.NoActionBar"/>
 
+        <!--<receiver android:name="swarajsaaj.smscodereader.receivers.OtpReader"-->
+            <!--android:permission="android.permission.BROADCAST_SMS">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.provider.Telephony.SMS_RECEIVED"/>-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

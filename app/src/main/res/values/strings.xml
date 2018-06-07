@@ -22,4 +22,6 @@
     <string name="forget_password">Forgotten password?</string>
     <string name="check_phone_number">Check phone number</string>
     <string name="please_wait">Please wait...</string>
+    <string name="resend_code">resend code</string>
+    <string name="change_phone_number">Change phone number</string>
 </resources>

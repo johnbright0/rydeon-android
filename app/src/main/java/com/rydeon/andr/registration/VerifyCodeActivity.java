@@ -3,6 +3,7 @@ package com.rydeon.andr.registration;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -33,6 +34,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import spencerstudios.com.bungeelib.Bungee;
+import swarajsaaj.smscodereader.interfaces.OTPListener;
+import swarajsaaj.smscodereader.receivers.OtpReader;
 
 /**
  * Created by HP on 06/06/2018.
@@ -45,14 +48,16 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
     LoadingButton btn_verify;
     CheckPermission checkPermission;
     SmsVerifyCatcher smsVerifyCatcher;
-    String phoneNumber;
+    String phoneNumber, v_code = "";
     TextView verificationMessage;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.confirm_pin);
-//        getSupportActionBar().setTitle(R.string.verify);
+    //      getSupportActionBar().setTitle(R.string.verify);
+
+    //    OtpReader.bind(this,"rydeOn GH");
 
         Bundle extra = getIntent().getExtras();
         if(extra != null){
@@ -64,7 +69,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
         checkPermission.checkMultiple(new String[]{Permission.RECEIVE_SMS, Permission.READ_SMS}, null);
 
         verificationMessage = findViewById(R.id.verificationMessage);
-        verificationMessage.setText("A verification code has been sent to "+phoneNumber.substring(0, 5)+"*****. Enter code to confirm registration");
+        verificationMessage.setText("A verification code has been sent to "+phoneNumber.substring(0, 8)+"*****. Enter code to confirm registration");
         verifyCodeView = findViewById(R.id.verifyCodeView);
         btn_verify = findViewById(R.id.btn_verify);
         btn_change_number = findViewById(R.id.btn_change_number);
@@ -75,10 +80,13 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
 
         btn_send_code.setVisibility(View.GONE);
 
+        verifyCodeView.setTextSize(6);
+
         verifyCodeView.setListener(new VerifyCodeView.OnTextChangListener() {
             @Override
             public void afterTextChanged(String text) {
-                Toast.makeText(VerifyCodeActivity.this, text, Toast.LENGTH_SHORT).show();
+
+             //   Toast.makeText(VerifyCodeActivity.this, text, Toast.LENGTH_SHORT).show();
                 if (verifyCodeView.getText().length() == 6) {
                     verifyCode();
                 }
@@ -91,16 +99,18 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
             @Override
             public void onSmsCatch(String message) {
                 Log.d("PHONE", message);
-                String code = parseCode(message);
-                Log.d("CODE", code);
-                verifyCodeView.setText(code);
+                 v_code = parseCode(message);
+                verifyCodeView.setText(v_code.trim());
+
+                Log.d("V_CODE", v_code);
+
                 if (verifyCodeView.getText().length() == 6) {
                     verifyCode();
                 }
             }
         });
-        smsVerifyCatcher.setPhoneNumberFilter("rydeOn");
-        smsVerifyCatcher.setFilter("code is ");
+        smsVerifyCatcher.setPhoneNumberFilter("rydeOn GH");
+       // smsVerifyCatcher.setFilter("code is ");
 
         startHandlerAndWait10Seconds();
     }
@@ -214,8 +224,11 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
             public void onCompleted(Exception e, Response<String> result) {
 
                 if(e == null){
+                    smsVerifyCatcher.onStart();
                     Toast.makeText(VerifyCodeActivity.this, "Verification code sent", Toast.LENGTH_SHORT).show();
                     btn_send_code.setVisibility(View.GONE);
+                    btn_send_code.setText(getString(R.string.resend_code));
+                    stopTimer = false;
                     startHandlerAndWait10Seconds();
 
 
@@ -251,6 +264,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
         handler1.postDelayed(new Runnable() {
 
             public void run() {
+
                 // Start Countdown timer after wait for 10 seconds
                 startCountDown();
 
@@ -278,4 +292,22 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
             }
         });
     }
+
+    /**
+     * need for Android 6 real time permissions
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        smsVerifyCatcher.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+//    @Override
+//    public void otpReceived(String messageText) {
+//        v_code = parseCode(messageText);
+//        Log.d("V_CODE", v_code.trim());
+//
+//        verifyCodeView.setText();
+//
+//    }
 }
