@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.rydeon.andr">
 
     <!--
@@ -14,11 +15,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:allowBackup="true"
+        tools:replace="android:allowBackup"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -50,11 +53,12 @@
             android:value="AIzaSyBiRybDXZt6tmJba_joQEdI7UluaAyfP5c"/>
 
         <activity android:name=".registration.LoginActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:theme="@style/Theme.Design.NoActionBar" />
 
         <activity android:name=".registration.RegisterActivity"
             />
-        <activity android:name=".registration.VerifyCodeActivity" />
+        <activity android:name=".registration.VerifyCodeActivity"
+            android:theme="@style/Theme.Design.NoActionBar"/>
 
     </application>
 

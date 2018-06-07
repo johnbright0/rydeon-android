@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/colorPrimary">
+    android:background="@android:color/background_light">
 
     <ScrollView
         android:id="@+id/layout_register"
@@ -25,8 +25,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/first_name"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white">
+                android:textColor="@color/primary_light"
+                android:textColorHint="@color/primary_light">
 
                 <EditText
                     android:id="@+id/edtFirstName"
@@ -43,8 +43,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/last_name"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white">
+                android:textColor="@color/primary_light"
+                android:textColorHint="@color/primary_light">
 
                 <EditText
                     android:id="@+id/edtLastName"
@@ -59,7 +59,9 @@
                 android:id="@+id/spinnerGender"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:spinnerMode="dialog">
+                android:spinnerMode="dialog"
+                >
+
 
             </Spinner>
 
@@ -70,8 +72,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/phone"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
+                android:textColor="@color/primary_light"
+                android:textColorHint="@color/primary_light"
                 >
 
                 <EditText
@@ -89,8 +91,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/prompt_password"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
+                android:textColor="@color/primary_light"
+                android:textColorHint="@color/primary_light"
                 app:passwordToggleEnabled="true"
                 >
 
@@ -109,8 +111,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/retypePassword"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
+                android:textColor="@color/primary_light"
+                android:textColorHint="@color/primary_light"
                 app:passwordToggleEnabled="true">
 
                 <EditText
@@ -133,7 +135,7 @@
                 app:lb_btnDisabledColor="@color/light_gray"
                 app:lb_disabledTextColor="@color/gray"
                 app:lb_btnText="@string/register"
-                app:lb_btnColor="@color/colorAccent"
+                app:lb_btnColor="@color/colorPrimary2"
                 />
 
 
@@ -146,7 +148,7 @@
                 android:gravity="center_horizontal"
                 android:text="Already registered? Login"
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="@color/primary_light"
                 android:textStyle="bold" />
 
 

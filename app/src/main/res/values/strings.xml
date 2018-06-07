@@ -20,4 +20,6 @@
     <string name="unmatch_password">Unmatched Password</string>
     <string name="verify">Verify</string>
     <string name="forget_password">Forgotten password?</string>
+    <string name="check_phone_number">Check phone number</string>
+    <string name="please_wait">Please wait...</string>
 </resources>

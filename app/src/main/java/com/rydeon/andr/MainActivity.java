@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.rydeon.andr.helper.SessionManager;
 import com.rydeon.andr.registration.LoginActivity;
 
+import java.security.Permission;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
 
@@ -59,24 +61,25 @@ public class MainActivity extends AppCompatActivity
         sm = new SessionManager(this);
         if(!sm.isLoggedIn()){
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
         }else{
             sm.setLogin(false);
+            // Construct a GeoDataClient.
+            mGeoDataClient = Places.getGeoDataClient(this, null);
+
+            // Construct a PlaceDetectionClient.
+            mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
+
+            // Construct a FusedLocationProviderClient.
+            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+            SupportMapFragment mapFragment =
+                    (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(MainActivity.this);
+
         }
 
 
-
-        // Construct a GeoDataClient.
-        mGeoDataClient = Places.getGeoDataClient(this, null);
-
-        // Construct a PlaceDetectionClient.
-        mPlaceDetectionClient = Places.getPlaceDetectionClient(this, null);
-
-        // Construct a FusedLocationProviderClient.
-        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(MainActivity.this);
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

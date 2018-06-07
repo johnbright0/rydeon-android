@@ -1,0 +1,18 @@
+package com.rydeon.andr.app;
+
+/**
+ * Created by HP on 07/06/2018.
+ */
+
+public class AppConfig {
+
+    private static String HOST = "http://192.168.43.97:5000/";
+
+    public static String SIGNUP = HOST+ "resources/rydeon/signup";
+    public static String LOGIN = HOST + "auth/login";
+    public static String VERIFY_CODE = HOST+"resources/rydeon/signup/verifycode";
+    public static String RESEND_VERIFICATION =HOST+ "resources/rydeon/signup/resendcode";
+
+    public static String CONTENT_TYPE = "application/json;charset=utf-8";
+
+}

@@ -18,7 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:text="A verification code has been sent to +2333553. Enter code to confirm registration"
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_margin="15dp"
@@ -48,7 +47,7 @@
             app:lb_btnDisabledColor="@color/light_gray"
             app:lb_disabledTextColor="@color/gray"
             app:lb_btnText="@string/verify"
-            app:lb_btnColor="@color/colorAccent"
+            app:lb_btnColor="@color/colorPrimary2"
             android:layout_marginTop="30dp"
             android:layout_below="@+id/verifyCodeView"
 
