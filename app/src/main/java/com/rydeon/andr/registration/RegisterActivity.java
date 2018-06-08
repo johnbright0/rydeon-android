@@ -132,8 +132,8 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (!verifyInputs()) {
-                 //   registerUser(first_name, last_name, gender,  phone, password, confirm_password);
                     if(checkPermissions()){
+                        registerUser(first_name, last_name, gender,  phone, password, confirm_password);
                         Toast.makeText(RegisterActivity.this, "permission granted - proceed", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(RegisterActivity.this, "permission not granted", Toast.LENGTH_SHORT).show();

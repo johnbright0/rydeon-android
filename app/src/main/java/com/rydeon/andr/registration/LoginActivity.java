@@ -92,6 +92,13 @@ public class LoginActivity extends AppCompatActivity {
                     layout_password.setErrorEnabled(true);
                     layout_password.setError(getString(R.string.field_required));
                 }else{
+                    if(phone.startsWith("0")){
+                        phone = phone.replaceFirst("0", "233");
+                    }
+                    else{
+                        layout_phone.setErrorEnabled(true);
+                        layout_phone.setError(getString(R.string.check_phone_number));
+                    }
                     if(checkPermissions()) {
                         loginUser(phone, password);
                     }else{
@@ -126,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 if(e == null){
                     if(result.getHeaders().code() == 200){
+                        btnLogin.loadingSuccessful();
                         String token = result.getHeaders().getHeaders().get("x-auth-token");
                         JWT jwt = new JWT(token);
                         String subject = jwt.getSubject();
@@ -135,8 +143,10 @@ public class LoginActivity extends AppCompatActivity {
                             JSONObject person = jsonObject.getJSONObject("person");
                             String email = person.getString("email");
                             String phonenumber = person.getString("phone");
+                            String full_name = person.getString("firstname")+" "+person.getString("lastname");
 
-                            sm.setUsername(email);
+
+                            sm.setUsername(full_name);
                             sm.setPhoneNumber(phonenumber);
 
                         } catch (JSONException e1) {
@@ -150,10 +160,14 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                     else{
+                        btnLogin.loadingFailed();
                         Toast.makeText(LoginActivity.this, "Error signing in...", Toast.LENGTH_SHORT).show();
+                        btnLogin.setResetAfterFailed(true);
                     }
                 }else{
                     e.printStackTrace();
+                    btnLogin.loadingFailed();
+                    btnLogin.setResetAfterFailed(true);
                 }
 
             }

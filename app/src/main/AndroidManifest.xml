@@ -59,6 +59,8 @@
             />
         <activity android:name=".registration.VerifyCodeActivity"
             android:theme="@style/Theme.Design.NoActionBar"/>
+        <activity android:name=".LocationSearch" />
+        <activity android:name=".MyRidesActivity" />
 
         <!--<receiver android:name="swarajsaaj.smscodereader.receivers.OtpReader"-->
             <!--android:permission="android.permission.BROADCAST_SMS">-->
