@@ -24,4 +24,10 @@
     <string name="please_wait">Please wait...</string>
     <string name="resend_code">resend code</string>
     <string name="change_phone_number">Change phone number</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="Cancel">Cancel</string>
+    <string name="open_location_settings">Open Location Settings</string>
+    <string name="gps_network_not_enabled">Location is not enabled. To get your current location, please turn on your Location Service</string>
+    <string name="grant_location_access">For best user experience, grant rydeOn to an access to your current location</string>
+    <string name="grant_access">Grant Access</string>
 </resources>

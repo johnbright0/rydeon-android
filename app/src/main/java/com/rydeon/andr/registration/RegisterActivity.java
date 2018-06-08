@@ -1,5 +1,6 @@
 package com.rydeon.andr.registration;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -84,7 +87,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        checkPermission = new CheckPermission(this);
+      //  checkPermission = new CheckPermission(this);
 
         sm = new SessionManager(this);
 
@@ -129,9 +132,12 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (!verifyInputs()) {
-                    //   Toast.makeText(LoginRegisterActivity.this, "POST DATA", Toast.LENGTH_SHORT).show();
-                    registerUser(first_name, last_name, gender,  phone, password, confirm_password);
-                //    startActivity(new Intent(RegisterActivity.this, VerifyCodeActivity.class));
+                 //   registerUser(first_name, last_name, gender,  phone, password, confirm_password);
+                    if(checkPermissions()){
+                        Toast.makeText(RegisterActivity.this, "permission granted - proceed", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(RegisterActivity.this, "permission not granted", Toast.LENGTH_SHORT).show();
+                    }
 
                 }
 
@@ -258,7 +264,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void registerUser(String firstname, String lastname, String gender, final String phoneNumber, String password, String confirmPassword){
 
      //     Toast.makeText(this, "new number"+phoneNumber, Toast.LENGTH_SHORT).show();
-        checkPermission.checkMultiple(new String[]{Permission.RECEIVE_SMS, Permission.READ_SMS}, "To quickly verify your account, allow rydeOn to read your SMS");
+     //   checkPermission.checkMultiple(new String[]{Permission.RECEIVE_SMS, Permission.READ_SMS}, "To quickly verify your account, allow rydeOn to read your SMS");
 
         btn_register.startLoading();
         JsonObject jsonObject = new JsonObject();
@@ -315,22 +321,41 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//
-//        if(requestCode == REQUEST_CODE){
-//            //checking if permission is granted
-//            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-//                //permission is granted
-//            }
-//            else{
-//                Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//    }
-//
+    private static int REQUEST_CODE = 52;
+    private boolean permission_g = false;
+    private boolean checkPermissions(){
+        //check if there is permission to write on external storage
+        if(ContextCompat.checkSelfPermission(this,  Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED){
+            //permission already granted
+            return true;
+
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECEIVE_SMS, Manifest.permission.READ_SMS}, REQUEST_CODE);
+            return permission_g;
+
+        }
+
+
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        if(requestCode == REQUEST_CODE){
+            //checking if permission is granted
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                //permission is granted
+                permission_g = true;
+            }
+            else{
+             //   Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
+                permission_g = false;
+            }
+        }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 
 }
