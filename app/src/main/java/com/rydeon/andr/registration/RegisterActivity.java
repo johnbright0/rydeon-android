@@ -35,8 +35,6 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
-import com.reqica.drilon.androidpermissionchecklibrary.CheckPermission;
-import com.reqica.drilon.androidpermissionchecklibrary.Permission;
 import com.rydeon.andr.R;
 import com.rydeon.andr.app.AppConfig;
 import com.rydeon.andr.helper.SessionManager;
@@ -68,7 +66,6 @@ public class RegisterActivity extends AppCompatActivity {
     TextView txtSignUp, btn_goto_login;
     TextView maintext;
     ScrollView layout_register;
-    CheckPermission checkPermission;
 
     //registration page
     TextInputLayout layout_firstname, layout_lastname, layout_email, layout_password, layout_retypepassword, layout_phone;
@@ -133,8 +130,13 @@ public class RegisterActivity extends AppCompatActivity {
 
                 if (!verifyInputs()) {
                     if(checkPermissions()){
-                        registerUser(first_name, last_name, gender,  phone, password, confirm_password);
-                        Toast.makeText(RegisterActivity.this, "permission granted - proceed", Toast.LENGTH_SHORT).show();
+                       registerUser(first_name, last_name, gender,  phone, password, confirm_password);
+//                        Intent intent = new Intent(RegisterActivity.this, VerifyCodeActivity.class);
+//                        intent.putExtra("phoneNumber", "233546876543");
+//
+//                        startActivity(intent);
+//                        Bungee.slideLeft(RegisterActivity.this);
+                        //Toast.makeText(RegisterActivity.this, "permission granted - proceed", Toast.LENGTH_SHORT).show();
                     }else{
                         Toast.makeText(RegisterActivity.this, "permission not granted", Toast.LENGTH_SHORT).show();
                     }
@@ -290,8 +292,6 @@ public class RegisterActivity extends AppCompatActivity {
                         String message = object.getString("message");
                         if(status && message.equals("SUCCESS")){
 
-                            btn_register.reset();
-
                             Intent intent = new Intent(RegisterActivity.this, VerifyCodeActivity.class);
                             intent.putExtra("phoneNumber", phoneNumber);
 
@@ -301,17 +301,21 @@ public class RegisterActivity extends AppCompatActivity {
                         }
                         else if(!status){
                             Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                            btn_register.loadingFailed();
                             btn_register.reset();
-                        }
+                            btn_register.setEnabled(true);                        }
                     } catch (JSONException e1) {
                         e1.printStackTrace();
-                        btn_register.setResetAfterFailed(true);
-                    }
+                        btn_register.loadingFailed();
+                        btn_register.reset();
+                        btn_register.setEnabled(true);                    }
 
 
                 }else{
 
-                    btn_register.setResetAfterFailed(true);
+                    btn_register.loadingFailed();
+                    btn_register.reset();
+                    btn_register.setEnabled(true);
                     e.printStackTrace();
                     Toast.makeText(RegisterActivity.this, "Error signing in", Toast.LENGTH_SHORT).show();
                 }
@@ -357,5 +361,9 @@ public class RegisterActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Bungee.slideDown(RegisterActivity.this);
+    }
 }

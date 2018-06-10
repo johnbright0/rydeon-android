@@ -18,8 +18,6 @@ import com.google.gson.JsonObject;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
-import com.reqica.drilon.androidpermissionchecklibrary.CheckPermission;
-import com.reqica.drilon.androidpermissionchecklibrary.Permission;
 import com.rydeon.andr.MainActivity;
 import com.rydeon.andr.R;
 import com.rydeon.andr.app.AppConfig;
@@ -34,8 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import spencerstudios.com.bungeelib.Bungee;
-import swarajsaaj.smscodereader.interfaces.OTPListener;
-import swarajsaaj.smscodereader.receivers.OtpReader;
 
 /**
  * Created by HP on 06/06/2018.
@@ -46,7 +42,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
     VerifyCodeView verifyCodeView;
     SessionManager sm;
     LoadingButton btn_verify;
-    CheckPermission checkPermission;
+//    CheckPermission checkPermission;
     SmsVerifyCatcher smsVerifyCatcher;
     String phoneNumber, v_code = "";
     TextView verificationMessage;
@@ -65,8 +61,8 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
         }
 
         sm = new SessionManager(this);
-        checkPermission = new CheckPermission(this);
-        checkPermission.checkMultiple(new String[]{Permission.RECEIVE_SMS, Permission.READ_SMS}, null);
+//        checkPermission = new CheckPermission(this);
+//        checkPermission.checkMultiple(new String[]{Permission.RECEIVE_SMS, Permission.READ_SMS}, null);
 
         verificationMessage = findViewById(R.id.verificationMessage);
         verificationMessage.setText("A verification code has been sent to "+phoneNumber.substring(0, 8)+"*****. Enter code to confirm registration");
@@ -78,7 +74,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
         btn_change_number.setOnClickListener(this);
         btn_send_code.setOnClickListener(this);
 
-        btn_send_code.setVisibility(View.GONE);
+        btn_send_code.setText("");
 
         verifyCodeView.setTextSize(6);
 
@@ -112,7 +108,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
         smsVerifyCatcher.setPhoneNumberFilter("rydeOn GH");
        // smsVerifyCatcher.setFilter("code is ");
 
-        startHandlerAndWait10Seconds();
+        startHandlerAndWait10Seconds(); //start timer when verification page starts
     }
 
     private String parseCode(String message) {
@@ -180,13 +176,23 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
                         if(!status){
                             Toast.makeText(VerifyCodeActivity.this, jsonObject1.getString("message"), Toast.LENGTH_SHORT).show();
                             btn_verify.loadingFailed();
-                            btn_verify.setResetAfterFailed(true);
+                            btn_verify.reset();
+                            btn_verify.setEnabled(true);
                         }else{
+                            String token = result.getHeaders().getHeaders().get("x-auth-token");
                             JSONObject successObject = jsonObject1.getJSONObject("result");
                             String phone = successObject.getString("phone");
+                            String full_name = successObject.getString("firstname")+" "+successObject.getString("lastname");
+                            String id = successObject.getString("id");
+                            String imageurl  = successObject.getString("image");
+
                             sm.setLogin(true);
                             sm.setPhoneNumber(phone);
-                            checkPermission.checkMultiple(new String[]{Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION}, null);
+                            sm.setUsername(full_name);
+                            sm.setUserID(id);
+                            sm.setToken(token);
+                            sm.setImageUrl(imageurl);
+                        //    checkPermission.checkMultiple(new String[]{Permission.ACCESS_FINE_LOCATION, Permission.ACCESS_COARSE_LOCATION}, null);
                             btn_verify.loadingSuccessful();
                             startActivity(new Intent(VerifyCodeActivity.this, MainActivity.class));
                             finish();
@@ -196,13 +202,16 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
                     } catch (JSONException e1) {
                         e1.printStackTrace();
                         btn_verify.loadingFailed();
-                        btn_verify.setResetAfterFailed(true);
+                        btn_verify.reset();
+                        btn_verify.setEnabled(true);
                     }
 
                 }else{
                     e.printStackTrace();
                     btn_verify.loadingFailed();
-                    btn_verify.setResetAfterFailed(true);
+                    btn_verify.reset();
+                    btn_verify.setEnabled(true);
+
                 }
 
             }
@@ -226,8 +235,10 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
                 if(e == null){
                     smsVerifyCatcher.onStart();
                     Toast.makeText(VerifyCodeActivity.this, "Verification code sent", Toast.LENGTH_SHORT).show();
-                    btn_send_code.setVisibility(View.GONE);
-                    btn_send_code.setText(getString(R.string.resend_code));
+                    btn_send_code.setText("");
+                    const_sec = 60;
+                    seconds = new_seconds * 2;
+                    new_seconds = seconds;
                     stopTimer = false;
                     startHandlerAndWait10Seconds();
 
@@ -259,31 +270,41 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
     }
 
     private boolean stopTimer = false;
+    Handler handler1;
     private void startHandlerAndWait10Seconds(){
-        Handler handler1 = new Handler();
+        handler1 = new Handler();
         handler1.postDelayed(new Runnable() {
 
             public void run() {
-
                 // Start Countdown timer after wait for 10 seconds
                 startCountDown();
 
             }
         }, 10000);
     }
-
+    int seconds = 60;
+    int new_seconds = seconds;
+    int const_sec = 60;
     private void startCountDown (){
+
         final Handler handler2 = new Handler();
         handler2.post(new Runnable() {
-            int seconds = 60;
+
 
             public void run() {
                 seconds--;
               //  mhello.setText("" + seconds);
+                if(const_sec == 0) const_sec = 60;
+
+                const_sec --;
+                int mins = seconds/60;
+                btn_send_code.setText(mins+":"+ const_sec);
+                btn_send_code.setEnabled(false);
                 if (seconds < 0) {
                     // DO SOMETHING WHEN TIMES UP
                     stopTimer = true;
-                    btn_send_code.setVisibility(View.VISIBLE);
+                    btn_send_code.setText(getString(R.string.resend_code));
+                    btn_send_code.setEnabled(true);
                 }
                 if(!stopTimer) {
                     handler2.postDelayed(this, 1000);
@@ -292,6 +313,7 @@ public class VerifyCodeActivity extends AppCompatActivity implements Button.OnCl
             }
         });
     }
+
 
     /**
      * need for Android 6 real time permissions

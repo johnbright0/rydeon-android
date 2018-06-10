@@ -42,9 +42,10 @@ dependencies {
     implementation 'com.github.StevenDXC:DxLoadingButton:2.0'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.android.support:recyclerview-v7:27.1.1'
-    implementation 'com.reqica.drilon:android-permission-check-library:2.0.0'
+//    implementation 'com.reqica.drilon:android-permission-check-library:2.0.0'
     implementation 'com.github.stfalcon:smsverifycatcher:0.3.1'
-    implementation 'swarajsaaj:otpreader:1.1'
+//    implementation 'swarajsaaj:otpreader:1.1'
     implementation  project(':verifycode')
-
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
 }

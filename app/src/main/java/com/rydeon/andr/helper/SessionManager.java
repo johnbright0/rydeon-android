@@ -33,6 +33,8 @@ public class SessionManager {
     private static final String KEY_TOKEN = "token";
     private static final String KEY_PHONE = "phone";
 
+    private static final String KEY_IMAGE_URL = "image_url";
+
 
     public SessionManager(Context context){
         this._context = context;
@@ -90,6 +92,14 @@ public class SessionManager {
     }
     public String getPhoneNumber(){
         return pref.getString(KEY_PHONE, "DEF_USER_ID");
+    }
+
+    public void setImageUrl(String imageUrl){
+        editor.putString(KEY_IMAGE_URL, imageUrl);
+        editor.commit();
+    }
+    public String getImageUrl(){
+        return pref.getString(KEY_IMAGE_URL, null);
     }
 
 

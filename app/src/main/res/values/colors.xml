@@ -16,5 +16,8 @@
     <color name="colorAccent2">#eb1081</color>
     <color name="colorBackground">#cccccc</color>
     <color name="primary_light">#5b2e57</color>
+    <color name="primary_dark">#ffeee3</color>
+    <color name="primary">#7764ea</color>
+    <color name="accent">#ff5555</color>
 
 </resources>

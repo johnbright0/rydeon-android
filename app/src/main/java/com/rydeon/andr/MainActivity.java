@@ -33,9 +33,13 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.GlideContext;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.location.LocationAvailability;
@@ -64,15 +68,11 @@ public class MainActivity extends AppCompatActivity
 
     private static int REQUEST_CODE = 52;
     LocationRequest mLocationRequest;
-    Location mCurrentLocation;
     LocationManager locationManager;
     String location_coordinates = "";
     SessionManager sm;
-    private PlaceDetectionClient mPlaceDetectionClient;
-    private GeoDataClient mGeoDataClient;
+
     private GoogleMap mMap;
-    private boolean mLocationPermissionGranted;
-    private int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private int DEFAULT_ZOOM = 15;
     private Location mLastKnownLocation, currentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
     private Button btnSearchMap;
     private ImageButton btn_dropSearch;
     private TextView txtUsernameDisplay;
+    private ImageView userImage;
 
     //check if location is enabled
     public static boolean isLocationEnabled(Context context) {
@@ -156,8 +157,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
+        userImage = headerView.findViewById(R.id.userProfileImage);
         txtUsernameDisplay = headerView.findViewById(R.id.txtUsernameDisplay);
+
         txtUsernameDisplay.setText(sm.getUsername());
+        Glide.with(this).load(sm.getImageUrl()).into(userImage);
         navigationView.setNavigationItemSelectedListener(this);
 
 

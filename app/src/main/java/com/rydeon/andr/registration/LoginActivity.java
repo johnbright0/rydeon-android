@@ -23,8 +23,6 @@ import com.dx.dxloadingbutton.lib.LoadingButton;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
-import com.reqica.drilon.androidpermissionchecklibrary.CheckPermission;
-import com.reqica.drilon.androidpermissionchecklibrary.Permission;
 import com.rydeon.andr.MainActivity;
 import com.rydeon.andr.R;
 import com.rydeon.andr.app.AppConfig;
@@ -48,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     TextInputLayout layout_phone, layout_password;
     TextInputEditText edtPhone, edtPassword;
 
-    CheckPermission checkPermission;
+    //CheckPermission checkPermission;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         layout_phone = findViewById(R.id.layout_edt_login_phone);
         layout_password = findViewById(R.id.layout_edt_login_password);
 
-        checkPermission = new CheckPermission(this);
+//        checkPermission = new CheckPermission(this);
         sm = new SessionManager(this);
 
         txtRegister.setOnClickListener(new View.OnClickListener() {
@@ -139,15 +137,17 @@ public class LoginActivity extends AppCompatActivity {
                         String subject = jwt.getSubject();
                         Log.d("SUBJ: ", subject);
                         try {
-                            JSONObject jsonObject = new JSONObject(subject);
-                            JSONObject person = jsonObject.getJSONObject("person");
-                            String email = person.getString("email");
-                            String phonenumber = person.getString("phone");
-                            String full_name = person.getString("firstname")+" "+person.getString("lastname");
-
+                            JSONObject jsonObject = new JSONObject(result.getResult());
+                            String email = jsonObject.getString("email");
+                            String phonenumber = jsonObject.getString("phone");
+                            String image = jsonObject.getString("image");
+                            String full_name = jsonObject.getString("firstname")+" "+jsonObject.getString("lastname");
+                            String id = jsonObject.getString("id");
 
                             sm.setUsername(full_name);
                             sm.setPhoneNumber(phonenumber);
+                            sm.setUserID(id);
+                            sm.setImageUrl(image);
 
                         } catch (JSONException e1) {
                             e1.printStackTrace();
@@ -160,14 +160,16 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                     else{
-                        btnLogin.loadingFailed();
                         Toast.makeText(LoginActivity.this, "Error signing in...", Toast.LENGTH_SHORT).show();
-                        btnLogin.setResetAfterFailed(true);
+                        btnLogin.loadingFailed();
+                        btnLogin.reset();
+                        btnLogin.setEnabled(true);
                     }
                 }else{
                     e.printStackTrace();
                     btnLogin.loadingFailed();
-                    btnLogin.setResetAfterFailed(true);
+                    btnLogin.reset();
+                    btnLogin.setEnabled(true);
                 }
 
             }
