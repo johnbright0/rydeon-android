@@ -33,4 +33,5 @@
     <string name="pending_rides">Pending</string>
     <string name="sucessful">Successful</string>
     <string name="my_rides">My Rides</string>
+    <string name="gmap_key">AIzaSyBiRybDXZt6tmJba_joQEdI7UluaAyfP5c</string>
 </resources>

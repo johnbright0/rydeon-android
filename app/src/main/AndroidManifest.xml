@@ -31,11 +31,11 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -62,12 +62,9 @@
         <activity android:name=".LocationSearch" />
         <activity android:name=".MyRidesActivity" />
         <activity android:name=".MainActivity2">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
+        <activity android:name=".registration.UploadImage" />
 
         <!--<receiver android:name="swarajsaaj.smscodereader.receivers.OtpReader"-->
             <!--android:permission="android.permission.BROADCAST_SMS">-->

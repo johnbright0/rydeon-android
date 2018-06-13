@@ -12,7 +12,8 @@ public class AppConfig {
     public static String LOGIN = HOST + "auth/login";
     public static String VERIFY_CODE = HOST+"resources/rydeon/signup/verifycode";
     public static String RESEND_VERIFICATION =HOST+ "resources/rydeon/signup/resendcode";
-
+    public static String CAR = HOST +"api/rydeon/car";
+    public static String CREATE_JOURNEY = HOST +"api/rydeon/journey";
     public static String CONTENT_TYPE = "application/json;charset=utf-8";
 
 }

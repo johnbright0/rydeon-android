@@ -2,6 +2,7 @@ package com.rydeon.andr;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -35,11 +36,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.rydeon.andr.adapters.PlaceAutoCompleteAdapter;
 import com.rydeon.andr.app.Util;
+import com.rydeon.andr.registration.LoginActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +83,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         destination = findViewById(R.id.destination);
         send = findViewById(R.id.send);
 
+        startActivity(new Intent(MainActivity2.this, MainActivity.class));
 
         polylines = new ArrayList<>();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -385,6 +389,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
         });
 
 
+
         CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(18.013610, -77.498803));
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(16);
 
@@ -403,7 +408,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, new android.location.LocationListener() {
+     /**   locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, new android.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(),location.getLongitude()));
@@ -428,7 +433,7 @@ public class MainActivity2 extends AppCompatActivity implements OnMapReadyCallba
 
             }
         });
-
+*/
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, new android.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {

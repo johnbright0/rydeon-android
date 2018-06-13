@@ -5,32 +5,32 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,54 +38,77 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
-import com.bumptech.glide.GlideContext;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.GeoDataClient;
-import com.google.android.gms.location.places.PlaceDetectionClient;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.Response;
+import com.mikhaellopez.circularimageview.CircularImageView;
+import com.rydeon.andr.adapters.PlaceAutoCompleteAdapter;
+import com.rydeon.andr.app.Util;
 import com.rydeon.andr.helper.SessionManager;
 import com.rydeon.andr.registration.LoginActivity;
 
-import java.security.Permission;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 import spencerstudios.com.bungeelib.Bungee;
 
 public class MainActivity extends AppCompatActivity
-        implements Button.OnClickListener, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, LocationListener {
+        implements Button.OnClickListener, LocationListener, NavigationView.OnNavigationItemSelectedListener, GoogleMap.OnMyLocationButtonClickListener, GoogleMap.OnMyLocationClickListener, OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
 
     private static int REQUEST_CODE = 52;
     LocationRequest mLocationRequest;
     LocationManager locationManager;
-    String location_coordinates = "";
     SessionManager sm;
 
     private GoogleMap mMap;
-    private int DEFAULT_ZOOM = 15;
-    private Location mLastKnownLocation, currentLocation;
-    private FusedLocationProviderClient mFusedLocationProviderClient;
-    private String myCordinates = "6.666600400000001,-1.6162709";
-    private double latitude = 5.666667;
-    private double longitude = 0.000000;
+    private int DEFAULT_ZOOM = 16;
+    private Location currentLocation;
     private boolean permission_g = false;
-    private boolean stopTimer = false;
 
     private Button btnSearchMap;
-    private ImageButton btn_dropSearch;
+    private ImageButton btn_dropSearch, drawerToggle;
     private TextView txtUsernameDisplay;
-    private ImageView userImage;
+    private CircularImageView userImage, requestCurrentLocation;
+    ImageView send;
+
+    AutoCompleteTextView starting;
+    AutoCompleteTextView destination;
+    protected GoogleApiClient mGoogleApiClient;
+    private PlaceAutoCompleteAdapter mAdapter;
+    protected LatLng start;
+    protected LatLng end;
+    CardView cardView;
+
+    Marker marker;
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    private static final LatLngBounds BOUNDS_GHANA_OLD = new LatLngBounds(new LatLng(-57.965341647205726, 144.9987719580531),
+            new LatLng(72.77492067739843, -9.998857788741589));
+
+    LatLngBounds BOUNDS_GHANA = new LatLngBounds( new LatLng(4.840755, 0.1608107), new LatLng(11.143390, -3.143019));
 
     //check if location is enabled
     public static boolean isLocationEnabled(Context context) {
@@ -114,32 +137,57 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
+        //   Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //   toolbar.setTitle("");
+        //   setSupportActionBar(toolbar);
 //       if(Build.VERSION.SDK_INT > 20){
 //           toolbar.setElevation(0);         }
 
+        starting = findViewById(R.id.start);
+        destination = findViewById(R.id.destination);
+        send = findViewById(R.id.send);
+        drawerToggle = findViewById(R.id.btnDrawerToggle);
         cardView = findViewById(R.id.cardview);
         btnSearchMap = findViewById(R.id.searchMap);
         btn_dropSearch = findViewById(R.id.btn_dropSearch);
+        requestCurrentLocation = findViewById(R.id.requestCurrentLocation);
+
+        requestCurrentLocation.setOnClickListener(this);
         btnSearchMap.setOnClickListener(this);
         btn_dropSearch.setOnClickListener(this);
+        drawerToggle.setOnClickListener(this);
         sm = new SessionManager(this);
-        //  sm.setLogin(true);
+
         if (!sm.isLoggedIn()) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
+            // finish();
         } else if (checkPermissions()) {
-            //  sm.setLogin(false);
 
-            mLocationRequest = new LocationRequest();
-            // Construct a FusedLocationProviderClient.
-            mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Places.GEO_DATA_API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+            MapsInitializer.initialize(this);
+            mGoogleApiClient.connect();
 
             SupportMapFragment mapFragment =
                     (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(MainActivity.this);
+
+
+            mAdapter = new PlaceAutoCompleteAdapter(this, android.R.layout.simple_list_item_1,
+                    mGoogleApiClient, BOUNDS_GHANA, null);
+
+
+        /*
+        * Adds auto complete adapter to both auto complete
+        * text views.
+        * */
+            starting.setAdapter(mAdapter);
+            destination.setAdapter(mAdapter);
+
+            autoCompleteListeners(); /**this listens to two textviews */
 
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0, MainActivity.this);
@@ -149,33 +197,168 @@ public class MainActivity extends AppCompatActivity
         }
 
 
+        /**initialization of drawer toggle */
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        userImage = headerView.findViewById(R.id.userProfileImage);
+        userImage = headerView.findViewById(R.id.imageView1);
         txtUsernameDisplay = headerView.findViewById(R.id.txtUsernameDisplay);
 
         txtUsernameDisplay.setText(sm.getUsername());
-        Glide.with(this).load(sm.getImageUrl()).into(userImage);
+        if (sm.getImageUrl() != null)
+            Glide.with(this).load(sm.getImageUrl()).into(userImage);
         navigationView.setNavigationItemSelectedListener(this);
 
 
     }
 
+    /**check if location service is enabled **/
     private void checkLocationService() {
         if (isLocationEnabled(this)) {
             Toast.makeText(this, "Location service enabled", Toast.LENGTH_SHORT).show();
-            startHandlerAndWait10Seconds();
         } else {
             Toast.makeText(this, "Location service not enabled", Toast.LENGTH_SHORT).show();
             dialogToTurnOnLocation();
         }
     }
+
+
+    private void autoCompleteListeners() {
+         /*
+        * Sets the start and destination points based on the values selected
+        * from the autocomplete text views.
+        * */
+
+        starting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+                final String placeId = String.valueOf(item.placeId);
+                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
+
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                        .getPlaceById(mGoogleApiClient, placeId);
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(PlaceBuffer places) {
+                        if (!places.getStatus().isSuccess()) {
+                            // Request did not complete successfully
+                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+                            places.release();
+                            return;
+                        }
+                        // Get the Place object from the buffer.
+                        final Place place = places.get(0);
+
+                        start = place.getLatLng();
+                    }
+                });
+
+            }
+        });
+        destination.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+                final String placeId = String.valueOf(item.placeId);
+                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
+
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                        .getPlaceById(mGoogleApiClient, placeId);
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(PlaceBuffer places) {
+                        if (!places.getStatus().isSuccess()) {
+                            // Request did not complete successfully
+                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+                            places.release();
+                            return;
+                        }
+                        // Get the Place object from the buffer.
+                        final Place place = places.get(0);
+
+                        end = place.getLatLng();
+                    }
+                });
+
+            }
+        });
+
+        /*
+        These text watchers set the start and end points to null because once there's
+        * a change after a value has been selected from the dropdown
+        * then the value has to reselected from dropdown to get
+        * the correct location.
+        * */
+        starting.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int startNum, int before, int count) {
+                if (start != null) {
+                    start = null;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        destination.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+
+                if (end != null) {
+                    end = null;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Util.Operations.isOnline(MainActivity.this)) {
+                    /** this method searches through the db **/
+                } else {
+                    Toast.makeText(MainActivity.this, "No internet connectivity", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+    }
+
 
     @Override
     public void onBackPressed() {
@@ -247,36 +430,87 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (checkPermissions()) {
-            mMap.setMyLocationEnabled(true);
-        }
-        mMap.setOnMyLocationButtonClickListener(this);
-        mMap.setOnMyLocationClickListener(this);
 
-        getLocationCordinates();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        /**   locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, new android.location.LocationListener() {
+        @Override public void onLocationChanged(Location location) {
+        CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude()));
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(16);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+        }
+
+        @Override public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override public void onProviderDisabled(String provider) {
+
+        }
+        });
+         */
+
+        requestSingleLocation(mMap);
     }
 
-    private void getLocationCordinates() {
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
+    private void requestSingleLocation(final GoogleMap map) {
 
-        if (checkPermissions()) {
-            currentLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
         }
+        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, new android.location.LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
 
-        if (currentLocation != null) {
-            latitude = currentLocation.getLatitude();
-            longitude = currentLocation.getLongitude();
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
 
-            myCordinates = Double.toString(latitude) + "," + Double.toString(longitude);
+                CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(latitude, longitude));
+                CameraUpdate zoom = CameraUpdateFactory.zoomTo(DEFAULT_ZOOM);
 
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, latitude), DEFAULT_ZOOM));
+                map.moveCamera(center);
+                map.animateCamera(zoom);
 
-            //  getPlusCodeData(myCordinates);
+                requestLocationName(latitude, longitude);
+            }
 
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        }
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        }, null);
 
     }
 
@@ -291,9 +525,9 @@ public class MainActivity extends AppCompatActivity
             return permission_g;
 
         }
+    }//end of check permissions method
 
 
-    }
 
     @Override
     protected void onResume() {
@@ -367,40 +601,6 @@ public class MainActivity extends AppCompatActivity
         dialog.show();
     }
 
-    private void startHandlerAndWait10Seconds() {
-        Handler handler1 = new Handler();
-        handler1.postDelayed(new Runnable() {
-
-            public void run() {
-
-                // Start Countdown timer after wait for 10 seconds
-                startCountDown();
-
-            }
-        }, 10000);
-    }
-
-    private void startCountDown() {
-        final Handler handler2 = new Handler();
-        handler2.post(new Runnable() {
-            int seconds = 30;
-
-            public void run() {
-                seconds--;
-                //  mhello.setText("" + seconds);
-                if (seconds < 0) {
-                    // DO SOMETHING WHEN TIMES UP
-                    stopTimer = true;
-                    Toast.makeText(MainActivity.this, "getting location", Toast.LENGTH_SHORT).show();
-                    getLocationCordinates();
-                }
-                if (!stopTimer) {
-                    handler2.postDelayed(this, 1000);
-                }
-
-            }
-        });
-    }
 
     @Override
     public void onLocationChanged(Location location) {
@@ -409,7 +609,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-CardView cardView;
     @Override
     public void onClick(View v) {
      //   startActivity(new Intent(MainActivity.this, LocationSearch.class));
@@ -425,6 +624,78 @@ CardView cardView;
             YoYo.with(Techniques.SlideOutDown).duration(500).playOn(findViewById(R.id.cardview));
             //cardView.setVisibility(View.GONE);
         }
+        if(v == drawerToggle){
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.openDrawer(Gravity.START);
+        }
+        if(v == requestCurrentLocation){
+            if(isLocationEnabled(this)) {
+                Toast.makeText(this, "requesting location...", Toast.LENGTH_SHORT).show();
+                requestSingleLocation(mMap);
+            }else{
+                dialogToTurnOnLocation();
+            }
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+
+
+    /**this method requests location name using latlong parameter */
+    private void requestLocationName(final double latitude, final double longitude){
+
+        String latLong = latitude +","+longitude;
+
+        String url = "https://plus.codes/api?address="+latLong+"&ekey="+getString(R.string.gmap_key)+"&email=brightnyamata@gmail.com";
+
+
+        Ion.with(MainActivity.this).load(url)
+                .asString().withResponse().setCallback(new FutureCallback<Response<String>>() {
+            @Override
+            public void onCompleted(Exception e, Response<String> result) {
+
+                if(e == null){
+
+                    try {
+                        JSONObject object = new JSONObject(result.getResult());
+
+                        //getting the location name
+                        JSONObject plus_code = object.getJSONObject("plus_code");
+                        JSONObject local_address = plus_code.getJSONObject("locality");
+                        String place_name = local_address.getString("local_address");
+
+                        starting.setText(place_name);
+                        if(marker != null){
+                            marker.remove();
+                        }
+                      marker =  mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title(place_name));
+
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+                    }
+
+                }else{
+                    Log.d("ERROR", "not found");
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
     }
 }
 

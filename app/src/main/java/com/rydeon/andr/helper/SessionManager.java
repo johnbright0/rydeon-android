@@ -69,7 +69,7 @@ public class SessionManager {
         //      Log.d(TAG, "username added: "+ username);
     }
     public String getUsername(){
-        return pref.getString(KEY_USER_ID, "DEF_USER_ID");
+        return pref.getString(KEY_USER_ID, "User");
     }
 
 

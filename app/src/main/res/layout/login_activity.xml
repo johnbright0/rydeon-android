@@ -37,7 +37,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="phone"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:drawableLeft="@drawable/ic_account_circle_black_24dp"
+                android:drawableStart="@drawable/ic_account_circle_black_24dp"
+                android:drawablePadding="10dp"
+                />
 
         </android.support.design.widget.TextInputLayout>
 
@@ -51,14 +55,19 @@
             android:hint="@string/password"
             android:textColorHint="@color/white"
             app:hintAnimationEnabled="true"
-            app:passwordToggleEnabled="true">
+            app:passwordToggleEnabled="true"
+            >
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/edt_login_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:drawableLeft="@drawable/ic_lock_outline_black_24dp"
+                android:drawableStart="@drawable/ic_lock_outline_black_24dp"
+                android:drawablePadding="10dp"
+                />
 
         </android.support.design.widget.TextInputLayout>
 
