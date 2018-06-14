@@ -58,7 +58,7 @@ public class PlaceAutoCompleteAdapter
     /**
      * Current results returned by this adapter.
      */
-    private ArrayList<PlaceAutocomplete> mResultList;
+    private ArrayList<PlaceAutocomplete> mResultList = new ArrayList<>();
 
     /**
      * Handles autocomplete requests.
@@ -100,7 +100,9 @@ public class PlaceAutoCompleteAdapter
      */
     @Override
     public int getCount() {
+
         return mResultList.size();
+
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -14,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.text.Editable;
@@ -29,15 +31,22 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.Resource;
 import com.daimajia.androidanimations.library.Techniques;
 import com.daimajia.androidanimations.library.YoYo;
 import com.google.android.gms.common.ConnectionResult;
@@ -55,8 +64,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.koushikdutta.async.future.FutureCallback;
@@ -67,6 +78,7 @@ import com.rydeon.andr.adapters.PlaceAutoCompleteAdapter;
 import com.rydeon.andr.app.Util;
 import com.rydeon.andr.helper.SessionManager;
 import com.rydeon.andr.registration.LoginActivity;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -87,6 +99,8 @@ public class MainActivity extends AppCompatActivity
     private Location currentLocation;
     private boolean permission_g = false;
 
+    SlidingUpPanelLayout slidingUpPanelLayout;
+
     private Button btnSearchMap;
     private ImageButton btn_dropSearch, drawerToggle;
     private TextView txtUsernameDisplay;
@@ -101,7 +115,10 @@ public class MainActivity extends AppCompatActivity
     protected LatLng end;
     CardView cardView;
 
+    EditText destination3;
+
     Marker marker;
+     ListView location_list;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -143,6 +160,8 @@ public class MainActivity extends AppCompatActivity
 //       if(Build.VERSION.SDK_INT > 20){
 //           toolbar.setElevation(0);         }
 
+        slidingUpPanelLayout = findViewById(R.id.sliding_layout);
+        location_list = findViewById(R.id.location_list);
         starting = findViewById(R.id.start);
         destination = findViewById(R.id.destination);
         send = findViewById(R.id.send);
@@ -151,6 +170,7 @@ public class MainActivity extends AppCompatActivity
         btnSearchMap = findViewById(R.id.searchMap);
         btn_dropSearch = findViewById(R.id.btn_dropSearch);
         requestCurrentLocation = findViewById(R.id.requestCurrentLocation);
+        slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
         requestCurrentLocation.setOnClickListener(this);
         btnSearchMap.setOnClickListener(this);
@@ -184,8 +204,11 @@ public class MainActivity extends AppCompatActivity
         * Adds auto complete adapter to both auto complete
         * text views.
         * */
-            starting.setAdapter(mAdapter);
-            destination.setAdapter(mAdapter);
+           starting.setAdapter(mAdapter);
+           destination.setAdapter(mAdapter);
+
+
+           location_list.setAdapter(mAdapter);
 
             autoCompleteListeners(); /**this listens to two textviews */
 
@@ -214,6 +237,7 @@ public class MainActivity extends AppCompatActivity
             Glide.with(this).load(sm.getImageUrl()).into(userImage);
         navigationView.setNavigationItemSelectedListener(this);
 
+        searchLocationSlidingMenu();
 
     }
 
@@ -227,12 +251,31 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
+    boolean start_click = false;
+    boolean end_click = false;
     private void autoCompleteListeners() {
          /*
         * Sets the start and destination points based on the values selected
         * from the autocomplete text views.
         * */
+
+//         starting.setOnClickListener(new View.OnClickListener() {
+//             @Override
+//             public void onClick(View v) {
+//                 start_click = true;
+//                 end_click = false;
+//                 Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
+//             }
+//         });
+//
+//         destination.setOnClickListener(new View.OnClickListener() {
+//             @Override
+//             public void onClick(View v) {
+//                 end_click = true;
+//                 start_click = false;
+//                 Toast.makeText(MainActivity.this, "endig", Toast.LENGTH_SHORT).show();
+//             }
+//         });
 
         starting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -316,10 +359,13 @@ public class MainActivity extends AppCompatActivity
                 if (start != null) {
                     start = null;
                 }
+                start_click = true;
+                 end_click = false;
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+
 
             }
         });
@@ -337,6 +383,8 @@ public class MainActivity extends AppCompatActivity
                 if (end != null) {
                     end = null;
                 }
+                start_click = false;
+                 end_click = true;
             }
 
             @Override
@@ -351,9 +399,58 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 if (Util.Operations.isOnline(MainActivity.this)) {
                     /** this method searches through the db **/
+
+                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                    slidingUpPanelLayout.animate();
+
+                    searchRide();
+
                 } else {
                     Toast.makeText(MainActivity.this, "No internet connectivity", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+
+        location_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+                final String placeId = String.valueOf(item.placeId);
+                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
+
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+                        .getPlaceById(mGoogleApiClient, placeId);
+                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+                    @Override
+                    public void onResult(PlaceBuffer places) {
+                        if (!places.getStatus().isSuccess()) {
+                            // Request did not complete successfully
+                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+                            places.release();
+                            return;
+                        }
+                        // Get the Place object from the buffer.
+                        final Place place = places.get(0);
+
+                        if(start_click) {
+                            start = place.getLatLng();
+                            starting.setText(place.getAddress());
+                            destination.requestFocus();
+                        }
+                        if(end_click){
+                            end = place.getLatLng();
+                            destination.setText(place.getAddress());
+                        }
+                        mAdapter.clear();
+                        Toast.makeText(MainActivity.this, "Place: "+place.getAddress()+" latLong: "+place.getLatLng(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -431,6 +528,13 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        CameraUpdate center = CameraUpdateFactory.newLatLng(new LatLng(5.600259, -0.191749));
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(10);
+
+        mMap.moveCamera(center);
+        mMap.animateCamera(zoom);
+
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -463,6 +567,20 @@ public class MainActivity extends AppCompatActivity
         }
         });
          */
+
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.style_json));
+
+            if (!success) {
+                Log.e("STYLE_RES", "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e("STYLE_RES", "Can't find style. Error: ", e);
+        }
 
         requestSingleLocation(mMap);
     }
@@ -614,15 +732,18 @@ public class MainActivity extends AppCompatActivity
      //   startActivity(new Intent(MainActivity.this, LocationSearch.class));
 
         if(v == btnSearchMap) {
-            cardView.setVisibility(View.VISIBLE);
-            YoYo.with(Techniques.SlideInUp).duration(500).playOn(findViewById(R.id.cardview));
-
+          //  cardView.setVisibility(View.VISIBLE);
+           // YoYo.with(Techniques.SlideInUp).duration(500).playOn(findViewById(R.id.cardview));
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+            slidingUpPanelLayout.animate();
             Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
         }
         if(v == btn_dropSearch){
 
-            YoYo.with(Techniques.SlideOutDown).duration(500).playOn(findViewById(R.id.cardview));
+        //  YoYo.with(Techniques.SlideOutDown).duration(500).playOn(findViewById(R.id.cardview));
             //cardView.setVisibility(View.GONE);
+            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            slidingUpPanelLayout.animate();
         }
         if(v == drawerToggle){
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -695,6 +816,39 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+
+    }//END OF request location name
+
+
+    /**sliding menu for searching location**/
+    private void searchLocationSlidingMenu(){
+
+        slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                if(slideOffset > 0)
+                panel.animate();
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+
+            }
+        });
+
+//
+//        SlidingMenu slidingMenu = new SlidingMenu(this);
+//        slidingMenu.setMode(SlidingMenu.RIGHT);
+//        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+//       // slidingMenu.setBehindOffsetRes(R.dimen.sl);
+//        slidingMenu.setFadeDegree(0.35f);
+//        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+//        slidingMenu.setMenu(R.layout.location_search_fragment);
+    }//end of search location sliding menu
+
+
+    /** this method searches ride **/
+    private void searchRide(){
 
     }
 }
