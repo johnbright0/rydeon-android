@@ -34,7 +34,7 @@ public class MyRidesActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
+     /*   viewPager = (ViewPager) findViewById(R.id.viewPager);
         setupViewPager(viewPager);
 
         tableLayout = (TabLayout) findViewById(R.id.tabs);
@@ -64,6 +64,8 @@ public class MyRidesActivity extends AppCompatActivity {
 
             }
         });
+
+        */
     }
 
     //setiing up the viewPager

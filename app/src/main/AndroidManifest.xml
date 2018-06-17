@@ -65,6 +65,8 @@
 
         </activity>
         <activity android:name=".registration.UploadImage" />
+        <activity android:name=".AddCarActivity" />
+        <activity android:name=".MyCarsActivity" />
 
         <!--<receiver android:name="swarajsaaj.smscodereader.receivers.OtpReader"-->
             <!--android:permission="android.permission.BROADCAST_SMS">-->

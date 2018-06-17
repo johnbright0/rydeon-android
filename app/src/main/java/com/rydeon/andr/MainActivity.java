@@ -500,7 +500,11 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_settings) {
 
-        } else if (id == R.id.nav_profile) {
+        }
+        else if ( id == R.id.nav_create_journey){
+            startActivity(new Intent(MainActivity.this, MyCarsActivity.class));
+        }
+        else if (id == R.id.nav_profile) {
 
         } else if (id == R.id.nav_logout) {
             sm.setLogin(false);
@@ -724,7 +728,7 @@ public class MainActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLongitude(), location.getLatitude()), DEFAULT_ZOOM));
-
+        
     }
 
     @Override

@@ -34,4 +34,16 @@
     <string name="sucessful">Successful</string>
     <string name="my_rides">My Rides</string>
     <string name="gmap_key">AIzaSyBiRybDXZt6tmJba_joQEdI7UluaAyfP5c</string>
+
+    <string name="RegistrationNo">Registration #</string>
+    <string name="model">Model</string>
+    <string name="year">Year</string>
+    <string name="add_car">Add Car</string>
+    <string name="create_journey">create journey</string>
+    <string name="logout">Logout</string>
+    <string name="join_ride">Join Ride</string>
+    <string name="amount">Fare</string>
+    <string name="confirm_location">confirm location</string>
+    <string name="rides_in_map">Rides in Maps</string>
+    <string name="maxRiders">Free seats</string>
 </resources>

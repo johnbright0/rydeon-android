@@ -6,6 +6,7 @@ package com.rydeon.andr.app;
 
 public class AppConfig {
 
+    public static final String PLACES = "places";
     private static String HOST = "http://192.168.43.97:5000/";
 
     public static String SIGNUP = HOST+ "resources/rydeon/signup";
