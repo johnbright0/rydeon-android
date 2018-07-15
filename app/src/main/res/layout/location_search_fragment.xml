@@ -1,72 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
     android:id="@+id/slidingPan">
 
-    <!--<fragment-->
-        <!--android:id="@+id/map"-->
-        <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content" />-->
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cardview"
-        android:layout_width="fill_parent"
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/txtPickedLocation"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/white"
+        android:textColor="@color/black"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:text="Picked Location"
+        android:gravity="center_vertical"
+        android:paddingStart="10dp"
+        android:paddingLeft="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:alpha="0.9"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        card_view:cardElevation="10dp"
-        card_view:cardBackgroundColor="@android:color/white"
-        card_view:cardCornerRadius="8dp">
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:weightSum="2">
 
-        <RelativeLayout
-            android:layout_width="fill_parent"
-            android:layout_height="match_parent"
-            >
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Cancel"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm_location"/>
 
-                <AutoCompleteTextView
-                    android:id="@+id/start"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:background="@android:color/transparent"
-                    android:hint="Choose a starting point..." />
+    </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginRight="50dp"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/dotted" />
-
-                <AutoCompleteTextView
-                    android:id="@+id/destination"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent"
-                    android:hint="Choose a destination..." />
-            </LinearLayout>
-            <ImageView
-                android:id="@+id/send"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="20dp"
-                android:layout_alignParentRight="true"
-                android:layout_width="36dp"
-                android:src="@android:drawable/ic_menu_send"
-                android:layout_height="36dp" />
-
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
-</android.support.v4.widget.SlidingPaneLayout>
+</RelativeLayout>

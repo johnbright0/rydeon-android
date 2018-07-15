@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,15 +10,48 @@
         android:orientation="vertical"
         android:layout_margin="10dp">
 
-        <Spinner
-            android:layout_marginTop="20dp"
-            android:id="@+id/spinnerMaker"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:spinnerMode="dialog"
-            android:background="@color/light_gray"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
 
-            />
+            <Button
+                android:id="@+id/btnSelectMake"
+                android:layout_weight="2.5"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="select make"/>
+            
+            <ProgressBar
+                android:id="@+id/progressBarMake"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            android:layout_marginTop="10dp">
+
+            <Button
+                android:id="@+id/btnSelectModel"
+                android:layout_weight="2.5"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="select model"/>
+
+            <ProgressBar
+                android:id="@+id/progressBarModel"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/layout_car_regNo"
@@ -37,22 +69,22 @@
 
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:id="@+id/layout_car_Model"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/model"
-            android:layout_marginTop="5dp">
+        <!--<android.support.design.widget.TextInputLayout-->
+            <!--android:id="@+id/layout_car_Model"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="@string/model"-->
+            <!--android:layout_marginTop="5dp">-->
 
 
-            <android.support.design.widget.TextInputEditText
-                android:id="@+id/edt_car_Model"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1"/>
+            <!--<android.support.design.widget.TextInputEditText-->
+                <!--android:id="@+id/edt_car_Model"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:inputType="text"-->
+                <!--android:maxLines="1"/>-->
 
-        </android.support.design.widget.TextInputLayout>
+        <!--</android.support.design.widget.TextInputLayout>-->
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/layout_car_year"
@@ -107,13 +139,26 @@
             android:background="@color/colorPrimary"
             android:text="@string/add_car"
             android:layout_marginTop="15dp"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:visibility="gone"/>
 
-
+        <com.dx.dxloadingbutton.lib.LoadingButton
+            android:id="@+id/btnAddCar"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            app:lb_resetAfterFailed="true"
+            app:lb_btnRippleColor="@color/black"
+            app:lb_btnDisabledColor="@color/light_gray"
+            app:lb_disabledTextColor="@color/gray"
+            app:lb_btnText="@string/add_car"
+            app:lb_btnColor="@color/colorPrimary"
+            />
 
     </LinearLayout>
 
 
 
 
-</android.support.constraint.ConstraintLayout>
+</ScrollView>

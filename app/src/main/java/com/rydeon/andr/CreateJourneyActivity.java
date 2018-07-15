@@ -33,6 +33,7 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
@@ -120,6 +121,8 @@ String journey_date = "";
     List<String> maxUserList = null;
     int max_users = 1;
 
+    Button btnPickLocation;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,17 +145,19 @@ String journey_date = "";
         btnStartDate = findViewById(R.id.btndatePicker);
         btnStartTime = findViewById(R.id.btntimePicker);
         btnAddJourney = findViewById(R.id.btn_add_journey);
+        btnPickLocation = findViewById(R.id.btnChooseLocation);
 
         btnStartDate.setOnClickListener(this);
         btnStartTime.setOnClickListener(this);
         btnAddJourney.setOnClickListener(this);
-        btnTrackLocation.setOnClickListener(this);
+        btnPickLocation.setOnClickListener(this);
+//        btnTrackLocation.setOnClickListener(this);
 
         //this method load spinner data
       //  loadPlaces();
       //  createPlaceAutocomplete();
 
-        fromPlaceAutocomplete();
+     //   fromPlaceAutocomplete();
         toPlaceAutocomplete();
       //  displayMaxNumberOfArrays();
     }
@@ -183,8 +188,24 @@ String journey_date = "";
             }
 
         }
+        if( v == btnPickLocation){
+
+            PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+            try {
+                startActivityForResult(builder.build(CreateJourneyActivity.this), PLACE_PICKER_REQUEST);
+            } catch (GooglePlayServicesRepairableException e) {
+                e.printStackTrace();
+            } catch (GooglePlayServicesNotAvailableException e) {
+                e.printStackTrace();
+            }
+
+            //startActivity(new Intent(CreateJourneyActivity.this, LocationSearch.class));
+
+        }
 
     }
+
+    int PLACE_PICKER_REQUEST = 43;
 
     private void pickDate() {
         new DatePickerDialog(CreateJourneyActivity.this, date, myCalendar
@@ -227,6 +248,15 @@ String journey_date = "";
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //  super.onActivityResult(requestCode, resultCode, data);
 
+
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlacePicker.getPlace(this, data);
+                String toastMsg = String.format("Place: %s", place.getAddress());
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+            }
+        }
+
         if(requestCode == REQUEST_CODE){
 
             if(resultCode == Activity.RESULT_OK){
@@ -234,7 +264,7 @@ String journey_date = "";
             //    local_address = data.getStringExtra("local_address");
                 sourceAddress = data.getStringExtra("best_address");
                 sourceCoordinates = data.getStringExtra("location_coordinates");
-                autocompleteFragment.setText(sourceAddress);
+                //autocompleteFragment.setText(sourceAddress);
                 //    Toast.makeText(getActivity(), locationCoordinates, Toast.LENGTH_SHORT).show();
             //    txtLocationDetails.setText("PLUS_CODE: "+plus_code+"\nLOCAL ADDRESS: "+local_address+"\nBest Address: "+best_streetAdd);
                 Toast.makeText(this, "Location Tracked", Toast.LENGTH_SHORT).show();
@@ -485,31 +515,31 @@ String journey_date = "";
             // TODO: Handle the error.
         }
     }
-    PlaceAutocompleteFragment autocompleteFragment;
-    private void fromPlaceAutocomplete() {
-
-         autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragmentFrom);
-
-
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
-                Log.i("TAG", "Place: " + place.getName());
-
-                sourceAddress = place.getName().toString();
-                sourceCoordinates = place.getLatLng().toString().replaceAll("\\(", "").replaceAll("\\)", "").replace("lat/lng:", "");
-
-            }
-
-            @Override
-            public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i("TAG", "An error occurred: " + status);
-            }
-        });
-    }
+//    PlaceAutocompleteFragment autocompleteFragment;
+//    private void fromPlaceAutocomplete() {
+//
+//         autocompleteFragment = (PlaceAutocompleteFragment)
+//                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragmentFrom);
+//
+//
+//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+//            @Override
+//            public void onPlaceSelected(Place place) {
+//                // TODO: Get info about the selected place.
+//                Log.i("TAG", "Place: " + place.getName());
+//
+//                sourceAddress = place.getName().toString();
+//                sourceCoordinates = place.getLatLng().toString().replaceAll("\\(", "").replaceAll("\\)", "").replace("lat/lng:", "");
+//
+//            }
+//
+//            @Override
+//            public void onError(Status status) {
+//                // TODO: Handle the error.
+//                Log.i("TAG", "An error occurred: " + status);
+//            }
+//        });
+//    }
 
     private void toPlaceAutocomplete() {
 

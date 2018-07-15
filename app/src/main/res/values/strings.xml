@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">rydeOn</string>
+    <string name="FACEBOOK_APP_ID">153106458887162</string>
+    <string name="ACCOUNT_KIT_CLIENT_TOKEN">9213866e7eb63d23c0700b0598f9c682</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -46,4 +48,7 @@
     <string name="confirm_location">confirm location</string>
     <string name="rides_in_map">Rides in Maps</string>
     <string name="maxRiders">Free seats</string>
+    <string name="choose_image">Choose Image</string>
+
+
 </resources>

@@ -44,6 +44,12 @@
             android:id="@+id/map_main"
             layout="@layout/content_main" />
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
     </RelativeLayout>
 
             <!--<fragment-->
@@ -76,9 +82,21 @@
     android:src="@drawable/ic_my_location"
         app:civ_border="true"
         app:civ_border_color="@color/white"
+        android:visibility="gone"
 />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabRequestCurrentLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_my_location_white"
+        app:fabSize="mini"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        />
+
 </android.support.design.widget.CoordinatorLayout>
+
 
 
     <android.support.v7.widget.CardView

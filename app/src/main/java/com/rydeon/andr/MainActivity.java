@@ -1,6 +1,7 @@
 package com.rydeon.andr;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +14,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SlidingPaneLayout;
@@ -31,6 +34,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
@@ -42,6 +46,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,12 +75,15 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.hzn.lib.EasyTransition;
+import com.hzn.lib.EasyTransitionOptions;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.Response;
 import com.mikhaellopez.circularimageview.CircularImageView;
 import com.rydeon.andr.adapters.PlaceAutoCompleteAdapter;
 import com.rydeon.andr.app.Util;
+import com.rydeon.andr.fblogin.FBLoginActivity;
 import com.rydeon.andr.helper.SessionManager;
 import com.rydeon.andr.registration.LoginActivity;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -105,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     private ImageButton btn_dropSearch, drawerToggle;
     private TextView txtUsernameDisplay;
     private CircularImageView userImage, requestCurrentLocation;
+    private FloatingActionButton fabRequestCurrentLocation;
     ImageView send;
 
     AutoCompleteTextView starting;
@@ -115,6 +124,8 @@ public class MainActivity extends AppCompatActivity
     protected LatLng end;
     CardView cardView;
 
+
+    private ProgressBar progressBar;
     EditText destination3;
 
     Marker marker;
@@ -162,25 +173,30 @@ public class MainActivity extends AppCompatActivity
 
         slidingUpPanelLayout = findViewById(R.id.sliding_layout);
         location_list = findViewById(R.id.location_list);
-        starting = findViewById(R.id.start);
-        destination = findViewById(R.id.destination);
-        send = findViewById(R.id.send);
+
         drawerToggle = findViewById(R.id.btnDrawerToggle);
         cardView = findViewById(R.id.cardview);
         btnSearchMap = findViewById(R.id.searchMap);
         btn_dropSearch = findViewById(R.id.btn_dropSearch);
         requestCurrentLocation = findViewById(R.id.requestCurrentLocation);
+        fabRequestCurrentLocation = findViewById(R.id.fabRequestCurrentLocation);
+        progressBar = findViewById(R.id.progressBar);
+
         slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+
         requestCurrentLocation.setOnClickListener(this);
+        fabRequestCurrentLocation.setOnClickListener(this);
         btnSearchMap.setOnClickListener(this);
         btn_dropSearch.setOnClickListener(this);
         drawerToggle.setOnClickListener(this);
         sm = new SessionManager(this);
 
         if (!sm.isLoggedIn()) {
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            // finish();
+            startActivity(new Intent(MainActivity.this, FBLoginActivity.class));
+             finish();
         } else if (checkPermissions()) {
 
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -196,21 +212,7 @@ public class MainActivity extends AppCompatActivity
             mapFragment.getMapAsync(MainActivity.this);
 
 
-            mAdapter = new PlaceAutoCompleteAdapter(this, android.R.layout.simple_list_item_1,
-                    mGoogleApiClient, BOUNDS_GHANA, null);
 
-
-        /*
-        * Adds auto complete adapter to both auto complete
-        * text views.
-        * */
-           starting.setAdapter(mAdapter);
-           destination.setAdapter(mAdapter);
-
-
-           location_list.setAdapter(mAdapter);
-
-            autoCompleteListeners(); /**this listens to two textviews */
 
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             // locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0, MainActivity.this);
@@ -233,7 +235,7 @@ public class MainActivity extends AppCompatActivity
         txtUsernameDisplay = headerView.findViewById(R.id.txtUsernameDisplay);
 
         txtUsernameDisplay.setText(sm.getUsername());
-        if (sm.getImageUrl() != null)
+        if (sm.getImageUrl() != null || !sm.getImageUrl().isEmpty())
             Glide.with(this).load(sm.getImageUrl()).into(userImage);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -250,212 +252,6 @@ public class MainActivity extends AppCompatActivity
             dialogToTurnOnLocation();
         }
     }
-
-    boolean start_click = false;
-    boolean end_click = false;
-    private void autoCompleteListeners() {
-         /*
-        * Sets the start and destination points based on the values selected
-        * from the autocomplete text views.
-        * */
-
-//         starting.setOnClickListener(new View.OnClickListener() {
-//             @Override
-//             public void onClick(View v) {
-//                 start_click = true;
-//                 end_click = false;
-//                 Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
-//             }
-//         });
-//
-//         destination.setOnClickListener(new View.OnClickListener() {
-//             @Override
-//             public void onClick(View v) {
-//                 end_click = true;
-//                 start_click = false;
-//                 Toast.makeText(MainActivity.this, "endig", Toast.LENGTH_SHORT).show();
-//             }
-//         });
-
-        starting.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
-                final String placeId = String.valueOf(item.placeId);
-                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
-
-            /*
-             Issue a request to the Places Geo Data API to retrieve a Place object with additional
-              details about the place.
-              */
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                        .getPlaceById(mGoogleApiClient, placeId);
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(PlaceBuffer places) {
-                        if (!places.getStatus().isSuccess()) {
-                            // Request did not complete successfully
-                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
-                            places.release();
-                            return;
-                        }
-                        // Get the Place object from the buffer.
-                        final Place place = places.get(0);
-
-                        start = place.getLatLng();
-                    }
-                });
-
-            }
-        });
-        destination.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
-                final String placeId = String.valueOf(item.placeId);
-                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
-
-            /*
-             Issue a request to the Places Geo Data API to retrieve a Place object with additional
-              details about the place.
-              */
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                        .getPlaceById(mGoogleApiClient, placeId);
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(PlaceBuffer places) {
-                        if (!places.getStatus().isSuccess()) {
-                            // Request did not complete successfully
-                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
-                            places.release();
-                            return;
-                        }
-                        // Get the Place object from the buffer.
-                        final Place place = places.get(0);
-
-                        end = place.getLatLng();
-                    }
-                });
-
-            }
-        });
-
-        /*
-        These text watchers set the start and end points to null because once there's
-        * a change after a value has been selected from the dropdown
-        * then the value has to reselected from dropdown to get
-        * the correct location.
-        * */
-        starting.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int startNum, int before, int count) {
-                if (start != null) {
-                    start = null;
-                }
-                start_click = true;
-                 end_click = false;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-
-            }
-        });
-
-        destination.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-
-                if (end != null) {
-                    end = null;
-                }
-                start_click = false;
-                 end_click = true;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (Util.Operations.isOnline(MainActivity.this)) {
-                    /** this method searches through the db **/
-
-                    slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                    slidingUpPanelLayout.animate();
-
-                    searchRide();
-
-                } else {
-                    Toast.makeText(MainActivity.this, "No internet connectivity", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-
-        location_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                final PlaceAutoCompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
-                final String placeId = String.valueOf(item.placeId);
-                Log.i(LOG_TAG, "Autocomplete item selected: " + item.description);
-
-            /*
-             Issue a request to the Places Geo Data API to retrieve a Place object with additional
-              details about the place.
-              */
-                PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                        .getPlaceById(mGoogleApiClient, placeId);
-                placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
-                    @Override
-                    public void onResult(PlaceBuffer places) {
-                        if (!places.getStatus().isSuccess()) {
-                            // Request did not complete successfully
-                            Log.e(LOG_TAG, "Place query did not complete. Error: " + places.getStatus().toString());
-                            places.release();
-                            return;
-                        }
-                        // Get the Place object from the buffer.
-                        final Place place = places.get(0);
-
-                        if(start_click) {
-                            start = place.getLatLng();
-                            starting.setText(place.getAddress());
-                            destination.requestFocus();
-                        }
-                        if(end_click){
-                            end = place.getLatLng();
-                            destination.setText(place.getAddress());
-                        }
-                        mAdapter.clear();
-                        Toast.makeText(MainActivity.this, "Place: "+place.getAddress()+" latLong: "+place.getLatLng(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-        });
-
-    }
-
 
     @Override
     public void onBackPressed() {
@@ -502,7 +298,7 @@ public class MainActivity extends AppCompatActivity
 
         }
         else if ( id == R.id.nav_create_journey){
-            startActivity(new Intent(MainActivity.this, MyCarsActivity.class));
+            startActivity(new Intent(MainActivity.this, CreateJourneyActivity.class));
         }
         else if (id == R.id.nav_profile) {
 
@@ -738,8 +534,14 @@ public class MainActivity extends AppCompatActivity
         if(v == btnSearchMap) {
           //  cardView.setVisibility(View.VISIBLE);
            // YoYo.with(Techniques.SlideInUp).duration(500).playOn(findViewById(R.id.cardview));
-            slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-            slidingUpPanelLayout.animate();
+         //   slidingUpPanelLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+         //   slidingUpPanelLayout.animate();
+
+            EasyTransitionOptions options = EasyTransitionOptions.makeTransitionOptions(MainActivity.this,
+                    findViewById(R.id.searchMap));
+            Intent intent = new Intent(MainActivity.this, SearchJourneyActivity.class);
+            EasyTransition.startActivityForResult(intent, 5, options);
+
             Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
         }
         if(v == btn_dropSearch){
@@ -761,7 +563,45 @@ public class MainActivity extends AppCompatActivity
                 dialogToTurnOnLocation();
             }
         }
+
+        if(v == fabRequestCurrentLocation){
+            if(isLocationEnabled(this)) {
+                Toast.makeText(this, "requesting location...", Toast.LENGTH_SHORT).show();
+                requestSingleLocation(mMap);
+            }else{
+                dialogToTurnOnLocation();
+            }
+        }
+
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 5){
+
+            if(resultCode == Activity.RESULT_OK){
+
+                String sourceName = data.getStringExtra("sourceName");
+                String sourceCord = data.getStringExtra("sourceCord");
+                String destinationName = data.getStringExtra("destinationName");
+                String destinationCord = data.getStringExtra("destinationCord");
+
+                Toast.makeText(this, "source: "+sourceName +"lat: "+sourceCord, Toast.LENGTH_SHORT).show();
+
+            }
+
+            if(resultCode == Activity.RESULT_CANCELED){
+                Toast.makeText(this, "canceled", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+    }
+
+    /** on activity for result */
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -803,7 +643,6 @@ public class MainActivity extends AppCompatActivity
                         JSONObject local_address = plus_code.getJSONObject("locality");
                         String place_name = local_address.getString("local_address");
 
-                        starting.setText(place_name);
                         if(marker != null){
                             marker.remove();
                         }
@@ -826,6 +665,8 @@ public class MainActivity extends AppCompatActivity
 
     /**sliding menu for searching location**/
     private void searchLocationSlidingMenu(){
+
+        slidingUpPanelLayout.setTouchEnabled(false);
 
         slidingUpPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -853,6 +694,8 @@ public class MainActivity extends AppCompatActivity
 
     /** this method searches ride **/
     private void searchRide(){
+
+        progressBar.setVisibility(View.GONE);
 
     }
 }
